@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitácora Digital · S-SDLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0D1321;
+    --surface: #131C31;
+    --surface-2: #182643;
+    --line: #263455;
+    --cyan: #2EC4B6;
+    --amber: #FF9F1C;
+    --text: #E8EEF2;
+    --muted: #8D99AE;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin: 0;
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(46,196,182,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 20%, rgba(255,159,28,0.06), transparent 55%);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a{ color: var(--cyan); }
+  a:focus-visible, button:focus-visible{ outline: 2px solid var(--cyan); outline-offset: 3px; }
+
+  .wrap{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  h1{
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(28px, 5vw, 38px);
+    font-weight: 700;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .subtitle{
+    color: var(--muted);
+    font-size: 16px;
+    margin: 0 0 24px;
+  }
+
+  .meta{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .meta div{
+    background: var(--surface);
+    padding: 12px 16px;
+  }
+  .meta .k{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .meta .v{ font-size: 14px; font-weight: 500; }
+
+  /* ---------- Log rail / sections ---------- */
+  .log{
+    margin-top: 40px;
+    position: relative;
+    padding-left: 34px;
+  }
+  .log::before{
+    content: "";
+    position: absolute;
+    left: 6px; top: 6px; bottom: 6px;
+    width: 1px;
+    background: linear-gradient(var(--line), var(--line) 90%, transparent);
+  }
+
+  section.entry{
+    position: relative;
+    margin-bottom: 40px;
+    animation: rise 0.5s ease both;
+  }
+  @media (prefers-reduced-motion: reduce){ section.entry{ animation: none; } }
+  @keyframes rise{ from{ opacity: 0; transform: translateY(8px);} to{ opacity: 1; transform: translateY(0);} }
+
+  section.entry::before{
+    content: attr(data-tick);
+    position: absolute;
+    left: -34px;
+    top: 2px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--cyan);
+  }
+
+  .tstamp{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+
+  h2{
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 21px;
+    font-weight: 600;
+    margin: 0 0 12px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  h2 .idx{
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--amber);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  h3{
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 20px 0 8px;
+    color: var(--text);
+  }
+
+  p{ margin: 0 0 12px; color: #C9D2DC; font-size: 15px; }
+
+  ul.tasklist{ list-style: none; margin: 10px 0 16px; padding: 0; }
+  ul.tasklist li{
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 14.5px;
+    color: #C9D2DC;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  ul.tasklist li:last-child{ border-bottom: none; }
+  ul.tasklist li::before{
+    content: "✓";
+    color: var(--cyan);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .status{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 100px;
+    margin-left: auto;
+  }
+  .status.done{ color: var(--cyan); background: rgba(46,196,182,0.10); border: 1px solid rgba(46,196,182,0.35); }
+  .status.pending{ color: var(--amber); background: rgba(255,159,28,0.10); border: 1px solid rgba(255,159,28,0.35); }
+
+  /* ---------- Files table ---------- */
+  .files{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin-top: 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .files thead th{
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--surface-2);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .files td{
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    color: #C9D2DC;
+  }
+  .files tr:last-child td{ border-bottom: none; }
+  .files td.fname{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--cyan);
+    white-space: nowrap;
+  }
+  .files tbody tr{ background: var(--surface); }
+  .files tbody tr:nth-child(even){ background: var(--surface-2); }
+
+  /* ---------- Footer ---------- */
+  footer{
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 560px){
+    .wrap{ padding: 32px 16px 60px; }
+    header{ padding: 22px 18px 20px; }
+    .log{ padding-left: 26px; }
+    section.entry::before{ left: -26px; }
+    footer{ flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Bitácora Digital</h1>
+    <p class="subtitle">Aplicar Ciclos de Vida de Sistemas de Software Seguro (S-SDLC)</p>
+  </header>
+
+  <div class="log">
+
+    <section class="entry" data-tick="1">
+      <div class="tstamp">08:41 — INICIO DE SESIÓN</div>
+      <h2><span class="idx">01</span> Objetivo de la sesión</h2>
+      <p>Elaborar los productos gráficos solicitados por la guía de la especialidad —esquema de flujo digital de las etapas del S-SDLC— utilizando como base la guía teórica <em>“Ciclos de Vida de Sistemas de Software Seguro y Supervivencia de Aplicaciones”</em>, con el fin de completar la evidencia requerida antes de subirla al formulario de Microsoft Forms.</p>
+    </section>
+
+    <section class="entry" data-tick="2">
+      <div class="tstamp">08:52 — DIAGRAMA GENERADO</div>
+      <h2><span class="idx">02</span> Diagrama de flujo del S-SDLC <span class="status done">completado</span></h2>
+      <p>Se construyó un diagrama de flujo en formato Draw.io (<code>.drawio</code>) que representa de forma secuencial las seis fases del ciclo de desarrollo seguro descritas en la guía:</p>
+      <ul class="tasklist">
+        <li>Planificación y Requisitos</li>
+        <li>Análisis y Diseño Seguro</li>
+        <li>Codificación (Desarrollo)</li>
+        <li>Pruebas de Seguridad</li>
+        <li>Implementación y Lanzamiento</li>
+        <li>Mantenimiento Continuo</li>
+      </ul>
+      <p>Cada bloque incluye sus actividades clave y se conecta mediante flechas que muestran el orden del proceso, además de una flecha punteada de retroalimentación que representa el carácter cíclico y continuo del ciclo de vida seguro.</p>
+    </section>
+
+    <section class="entry" data-tick="3">
+      <div class="tstamp">09:05 — ESQUEMA GENERADO</div>
+      <h2><span class="idx">03</span> Esquema conceptual general <span class="status done">completado</span></h2>
+      <p>A solicitud del usuario, se elaboró un segundo esquema en Draw.io con estructura de mapa conceptual, organizado en un nodo central y cinco ramas temáticas que resumen todo el contenido de la guía:</p>
+      <ul class="tasklist">
+        <li>Fases del ciclo seguro — las seis etapas con sus actividades principales</li>
+        <li>Conceptos clave — S-SDLC, supervivencia, vulnerabilidad, mecanismos de protección, estrategia de recuperación</li>
+        <li>Estrategias de supervivencia — Resistencia, Reconocimiento, Recuperación, Adaptación</li>
+        <li>Mitos y realidades — los tres mitos comunes sobre seguridad y su explicación técnica</li>
+        <li>Marcos de referencia — NIST SSDF, OWASP SAMM, ISO/IEC 27034, Microsoft SDL, herramientas de GitHub</li>
+      </ul>
+    </section>
+
+    <section class="entry" data-tick="4">
+      <div class="tstamp">09:18 — SALIDA DE ARCHIVOS</div>
+      <h2><span class="idx">04</span> Archivos generados</h2>
+      <table class="files">
+        <thead>
+          <tr><th>Archivo</th><th>Contenido</th><th>Formato</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="fname">Flujo_SSDLC.drawio</td>
+            <td>Diagrama de flujo secuencial de las 6 fases del S-SDLC</td>
+            <td>Draw.io</td>
+          </tr>
+          <tr>
+            <td class="fname">Esquema_SSDLC.drawio</td>
+            <td>Esquema conceptual completo: fases, conceptos, estrategias, mitos y marcos de referencia</td>
+            <td>Draw.io</td>
+          </tr>
+          <tr>
+            <td class="fname">Bitacora_SSDLC.docx</td>
+            <td>Registro de las actividades realizadas en esta sesión</td>
+            <td>Word</td>
+          </tr>
+          <tr>
+            <td class="fname">bitacora-ssdlc.html</td>
+            <td>Versión web de esta misma bitácora</td>
+            <td>HTML</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="entry" data-tick="5">
+      <div class="tstamp">09:24 — REVISIÓN</div>
+      <h2><span class="idx">05</span> Aprendizajes y observaciones</h2>
+      <ul class="tasklist">
+        <li>Organizar el S-SDLC en un diagrama visual facilita comprender que la seguridad no es una fase aislada, sino un proceso presente en todo el ciclo de vida del software.</li>
+        <li>El esquema conceptual permitió relacionar las fases del desarrollo con las estrategias de supervivencia y los marcos de referencia de la industria, evidenciando cómo se aplican en la práctica.</li>
+      </ul>
+      <h3>Pendientes <span class="status pending" style="margin-left:0">en curso</span></h3>
+      <ul class="tasklist" style="margin-top:6px;">
+        <li>Exportar ambos diagramas como imagen y subirlos al formulario de Microsoft Forms indicado en la guía.</li>
+        <li>Continuar la práctica de laboratorio en GitHub bajo la metodología Scrum.</li>
+      </ul>
+    </section>
+
+  </div>
+
+  <footer>
+    <span>bitacora-ssdlc · v1.0</span>
+    <span>generado 30/07/2026</span>
+  </footer>
+
+</div>
+</body>
+</html>
